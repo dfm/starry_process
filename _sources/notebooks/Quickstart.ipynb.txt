@@ -1,0 +1,871 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Quickstart"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this tutorial, we will go over how to instantiate a `StarryProcess` object, how to sample from it, and how to use it to compute light curve likelihoods and do basic inference."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "%config InlineBackend.figure_format = \"retina\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "import matplotlib\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "\n",
+    "# Disable annoying font warnings\n",
+    "matplotlib.font_manager._log.setLevel(50)\n",
+    "\n",
+    "# Disable theano deprecation warnings\n",
+    "import warnings\n",
+    "\n",
+    "warnings.filterwarnings(\"ignore\", category=DeprecationWarning)\n",
+    "warnings.filterwarnings(\"ignore\", category=matplotlib.MatplotlibDeprecationWarning)\n",
+    "warnings.filterwarnings(\"ignore\", category=FutureWarning)\n",
+    "warnings.filterwarnings(\"ignore\", category=UserWarning, module=\"theano\")\n",
+    "\n",
+    "# Style\n",
+    "plt.style.use(\"default\")\n",
+    "plt.rcParams[\"savefig.dpi\"] = 100\n",
+    "plt.rcParams[\"figure.dpi\"] = 100\n",
+    "plt.rcParams[\"figure.figsize\"] = (12, 4)\n",
+    "plt.rcParams[\"font.size\"] = 14\n",
+    "plt.rcParams[\"text.usetex\"] = False\n",
+    "plt.rcParams[\"font.family\"] = \"sans-serif\"\n",
+    "plt.rcParams[\"font.sans-serif\"] = [\"Liberation Sans\"]\n",
+    "plt.rcParams[\"font.cursive\"] = [\"Liberation Sans\"]\n",
+    "plt.rcParams[\"mathtext.fontset\"] = \"cm\"\n",
+    "try:\n",
+    "    plt.rcParams[\"mathtext.fallback\"] = \"cm\"\n",
+    "except KeyError:\n",
+    "    plt.rcParams[\"mathtext.fallback_to_cm\"] = True\n",
+    "\n",
+    "# Short arrays when printing\n",
+    "np.set_printoptions(threshold=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Setup"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let us begin by importing the GP class we'll use, ``StarryProcess``, as well as some standard stuff:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from starry_process import StarryProcess\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from tqdm.auto import tqdm"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let us instantiate a `StarryProcess` object with default values for everything:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp = StarryProcess()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The hyperparameters of the GP are as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "from IPython.display import display, Markdown\n",
+    "from starry_process.defaults import defaults\n",
+    "\n",
+    "defaults[\"mu\"] = defaults.get(\"mu\", None)\n",
+    "defaults[\"sigma\"] = defaults.get(\"sigma\", None)\n",
+    "display(\n",
+    "    Markdown(\n",
+    "        \"\"\"\n",
+    "| attribute | description | default value |\n",
+    "| - | :- | :-:\n",
+    "| `r` | mean radius in degrees | `{r}` |\n",
+    "| `dr` | radius distribution half-width in degrees | `{dr}`|\n",
+    "| `a` | latitude distribution shape parameter | `{a}` |\n",
+    "| `b` | latitude distribution shape parameter | `{b}` |\n",
+    "| `mu` | latitude distribution mode in degrees | `{mu}` |\n",
+    "| `sigma` | latitude distribution standard deviation in degrees | `{sigma}` |\n",
+    "| `c` | fractional spot contrast | `{c}` |\n",
+    "| `n` | number of spots | `{n}` |\n",
+    "\"\"\".format(\n",
+    "            **defaults\n",
+    "        )\n",
+    "    )\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Two notes about these parameters.\n",
+    "First, by default, the radius distribution is a delta function centered at `r`; setting `dr`\n",
+    "to a numerical value changes this to a uniform distribution between `r - dr` and `r + dr`.\n",
+    "Second, by default, the latitude distribution is specified via the dimensionless shape\n",
+    "parameters `a` and `b`. These have a one-to-one correspondence with the mode `mu`\n",
+    "and standard deviation `sigma` of the distribution, which users can choose to specify instead."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's print the value of one of these hyperparameters as an example:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp.r"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Not quite what we expected! That's because `starry_process` is built on `theano`, a just-in-time compiled graph-based language. Unless we explicitly evaluate variables, they are just nodes in a graph: instructions on *how* to perform a given operation. This may be a bit of a nuisance at times, but it's what makes `starry_process` so fast while enabling the automatic differentiation needed for integration with inference suites like `pymc3`.\n",
+    "\n",
+    "Evaluating a `theano` tensor variable is super easy:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp.r.eval()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "That's more like it! We can now check that all of the parameters are in fact set to their default values:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for param in [\"r\", \"dr\", \"a\", \"b\", \"mu\", \"sigma\", \"c\", \"n\"]:\n",
+    "    print(\"{} = {}\".format(param, getattr(sp, param).eval()))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note that the `mu` and `sigma` parameters of the latitude distribution were automatically computed (since they are one-to-one functions of `a` and `b`). The default hyperparameters of the GP therefore correspond to 10 spots of radii $20^\\circ$ at $30^\\circ \\pm 5^\\circ$ latitude with 10% contrast."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Sampling"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Sampling in spherical harmonics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now that we've instantiated the GP, the simplest thing we can do is sample from it. There are two quantities we can sample: the surface map of the star and its corresponding light curve. The former is done by calling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y = sp.sample_ylm().eval()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "where `ylm` refers to the fact that the surface map is expressed in the spherical harmonic $Y_{l,m}$ basis, and we call `eval()` because, as before, we are dealing with `theano` tensors. The quantity `y` is the vector of spherical harmonic coefficients describing the surface:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Its shape is `(number of samples, number of coefficients)`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "(To get more samples, we could have used the `nsamples` kwarg to `sample_ylm()`.)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The vector has $(l_\\mathrm{max} + 1)^2 = 256$ elements, since it is an expansion up to spherical harmonic degree $l_\\mathrm{max} = 15$. The easiest way to visualize the corresponding surface map is via the `visualize` method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp.visualize(y, colorbar=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We're seeing the surface in a Mollweide projection in normalized units (i.e., the unspotted photosphere has an intensity of unity). The features cluster at about $\\pm30^\\circ$ latitude and have roughly the expected size. However, there are some bright features, some spots are darker than we'd expect, and there aren't exactly 10 spots $-$ this is all expected, since a stellar surface is not *really* a Gaussian process. What we're doing is just an approximation that works OK for sampling (but really well for inference)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also compute the light curve corresponding to this surface map. Let's define a time array spanning four rotations and evaluate the corresponding flux."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "t = np.linspace(0, 4, 250)\n",
+    "flux = sp.flux(y, t).eval()\n",
+    "flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since we didn't explicitly provide them in the call to `flux()`, the stellar inclination `i`, rotation period `p`, and limb darkening coefficient vector `u` all assume their default values:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "defaults[\"u\"] = defaults[\"u\"][: defaults[\"udeg\"]]\n",
+    "display(\n",
+    "    Markdown(\n",
+    "        \"\"\"\n",
+    "| attribute | description | default value |\n",
+    "| - | :- | :-:\n",
+    "| `i` | stellar inclination in degrees | `{i}` |\n",
+    "| `p` | stellar rotation period in days | `{p}`|\n",
+    "| `u` | limb darkening coefficient vector | `{u}` |\n",
+    "\"\"\".format(\n",
+    "            **defaults\n",
+    "        )\n",
+    "    )\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note also the shape of the flux vector, which is `(number of samples, number of time points)`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here's the flux as a function of time:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.plot(t, 1e3 * flux[0])\n",
+    "plt.xlabel(\"rotations\")\n",
+    "plt.ylabel(\"relative flux [ppt]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. note::\n",
+    "\n",
+    "    By default, the flux samples are normalized and zero-mean. This means they correspond to an observation in which the data points have been normalized to their mean value and then the baseline (which is unity, after normalization) is subtracted from all of them. This makes them unitless and relative. In the plot above, we multiplied them by 1,000 to get the flux in units of parts per thousand (ppt)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Sampling in flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If what we ultimately want are light curve samples, we can skip the map generation step entirely and simply call"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux = sp.sample(t, nsamples=50, eps=1e-8).eval()\n",
+    "flux"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "where this time we asked for 50 samples evaluated at times `t` (defined above). The `eps` parameter is the extra variance we add to the covariance matrix for stability; sometimes it may be necessary to tweak this depending on the application.\n",
+    "\n",
+    "Let's plot our samples:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for k in range(50):\n",
+    "    plt.plot(t, 1e3 * flux[k], alpha=0.5)\n",
+    "plt.xlabel(\"rotations\")\n",
+    "plt.ylabel(\"relative flux [ppt]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By default, `StarryProcess` marginalizes over inclination. That means each of these samples corresponds to a different random inclination drawn from an isotropic distribution between $0^\\circ$ and $90^\\circ$ (the distribution is actually just $p(I) = \\sin I$). If we wanted to condition on a specific inclination, we would pass `marginalize_over_inclination=False` when instantiating the `StarryProcess`, and explicitly pass a value for `i` in the call to `sample()`."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. note::\n",
+    "\n",
+    "    See the note about the flux units above."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Doing inference"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Chances are the real reason you're using a GP is to do inference with it. That is, we're interested in the *likelihood function* associated with the Gaussian process, which we can use to compute posterior probabilities of our model parameters conditioned on some data. The cool thing about a ``StarryProcess`` is that the likelihood is explicitly a function of the properties of the spots (the parameters we pass when instantiating the class). This is a *marginal* likelihood, since it's already implicitly integrated over all the possible ways spots with certain properties (e.g., a certain radius and a certain latitude distribution) can be arranged on the surface of a star. So we don't need any parameters specifying the *particular* properties of *individual* spots: just the parameters of the *distribution* of spots as a whole. When we do inference, those are the parameters we are trying to constrain."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Computing likelihoods from a `StarryProcess` is done via the `log_likelihood()` method. To see how this works, let's take the light curves we generated in the previous section and add a bit of noise to them to mimic a real observation. Here's the first one:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ferr = 1e-3\n",
+    "np.random.seed(0)\n",
+    "f = flux + ferr * np.random.randn(50, len(t))\n",
+    "plt.plot(t, f[0], \"C0.\", ms=3)\n",
+    "plt.xlabel(\"rotations\")\n",
+    "plt.ylabel(\"relative flux [ppt]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The light curve is `f` and the photometric uncertainty (i.e., the standard deviation of the data) is `sigma`. We can compute the likelihood of this dataset conditioned on the current parameters of the `StarryProcess` (which happen to be the ones that generated it!) by evaluating"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp.log_likelihood(t, f[0], ferr ** 2).eval()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "That number on its own doesn't mean that much; likelihoods are really only significant in a relative sense (or if we plug them into a sampler to compute actual posterior probabilities). Therefore, let's explore how the likelihood varies as we vary the parameters of our Gaussian process (remembering that the current, default parameters are the \"true\" ones)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you executed that lest cell yourself, you may have noticed it took many seconds to evaluate. That's because evaluating tensor variables in this manner is extremely slow, as none of the optimizations are enabled. To take advantage of those, we need to explicitly **compile** the functions we're interested in. In order to do that, let's take a short detour into the workings of `theano`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Compiling `theano` functions"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Even though we called the `eval()` method a few times above, it's usually a **bad idea** to do that, mostly because it's so slow! The real power of algorithms implemented in `theano` comes out when you compile them. To do that, let's import some stuff:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import theano\n",
+    "import theano.tensor as tt"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, as a concrete example, let's compile the log likelihood function from the previous section. In order to do that, we need to think for a second about what the **inputs** and **outputs** of our function will be. The output is easy: we simply want the numerical value of the log likelihood. As for the inputs, a lot of things go into the computation of the likelihood: namely, the three arguments to the `log_likelihood()` call (the time vector `t`, the flux vector `f`, and the flux uncertainty `sigma`), *as well as* all of the parameters of the GP. We didn't explicitly pass any when we instantiated the GP (we just kept them at their default values), but the likelihood certainly depends on them as well.\n",
+    "\n",
+    "We want the inputs to our function to be anything we'll want to be able to change when we call it, so that kind of depends on the use case. For concreteness, let's compile a function whose explicit inputs are two single quantities: the flux vector `f` and the spot radius `r`. The GP depends on a whole bunch of other stuff, but those will be constants $-$ that is, things like the time vector `t` or the spot contrast `c` will be baked into the function when we compile it.\n",
+    "\n",
+    "In order to allow the flux and the radius to vary, we won't give it them numerical values when compiling the function. Instead, we will make them tensor variables: placeholders for numerical values that can be operated on within the computational graph:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "f_tensor = tt.dvector()\n",
+    "r_tensor = tt.dscalar()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note that `theano` allows tensors with different numeric types (`bool`, `int`, `float`, ...) and of different dimensionality (`scalar`, `vector`, `matrix`, ...). Here we're simply telling `theano` that the flux is a vector quantity with double precision (hence the \"d\" in \"dvector\"), and the radius is a double precision scalar quantity. Note also that I added the suffix `_tensor` to both variables so we don't get name conflicts (since we're already using the variable `f` to denote the actual *numerical* value of the flux)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, let's instantiate our `StarryProcess` and compute the likelihood (without calling the `eval()` method):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp = StarryProcess(r=r_tensor)\n",
+    "log_likelihood_tensor = sp.log_likelihood(t, f_tensor, ferr ** 2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The quantity `log_likelihood_tensor` is a tensor variable representing the log likelihood of the process as a function of a bunch of stuff, including the tensor radius and tensor flux defined above. Note that we passed in quantities like `t` and `ferr` as actual numerical values, which means they will be baked into the function when we actually compile it.\n",
+    "\n",
+    "To compile a `theano` function, we do\n",
+    "\n",
+    "```python\n",
+    "func = theano.function(inputs, output)\n",
+    "```\n",
+    "\n",
+    "where `func` is a callable that accepts and returns numeric values corresponding to the list of `inputs` and to `output`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "log_likelihood = theano.function([f_tensor, r_tensor], log_likelihood_tensor)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The quantity `log_likelihood` is now a compiled function that takes in a vector and a scalar and outputs a scalar. Let's call it on the synthetic light curve from the previous section, using the default value of the radius:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "log_likelihood(f[0], 20.0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note that we got the same value as before, but there's one big difference: the function ran almost instantly. Now that we have an efficient likelihood function, let's get back to our section on inference!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Doing inference (continued)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The whole point of inference is that we don't typically know the parameters of our model. So let's compute the log likelihood over an array of values of the spot radius (while keeping everything else fixed at the true value)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "r = np.linspace(10, 45, 100)\n",
+    "ll = np.zeros_like(r)\n",
+    "for k in tqdm(range(len(r))):\n",
+    "    ll[k] = log_likelihood(f[0], r[k])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's plot the actual likelihood as a function of radius. Note that it's usually necessary to subtract the maximum value of the log likelihood before exponentiating to avoid overflow (or underflow). Remember that the normalization of the likelihood isn't meaningful, so we can add and subtract constants in log space to our heart's content without changing the *relative* probabilities."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "likelihood = np.exp(ll - np.max(ll))\n",
+    "plt.plot(r, likelihood, label=\"likelihood\")\n",
+    "plt.axvline(20, color=\"C1\", label=\"truth\")\n",
+    "plt.legend()\n",
+    "plt.ylabel(\"relative likelihood\")\n",
+    "plt.xlabel(\"spot radius [degrees]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "That looks pretty good! The likelihood peaks very close to the true value, and the truth is well within one standard deviation. But interestingly, we've uncovered a degeneracy! This particular light curve can be explained just as well with much larger spots of radius $\\sim 40^\\circ$!\n",
+    "\n",
+    "If we put on our Bayesian hats for a moment, we can explicitly assert we're placing a uniform prior on the radius (between $10^\\circ$ and $45^\\circ$) and normalize the curve above so it integrates to unity to obtain an actual posterior probability distribution for the radius:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "prob = likelihood / np.trapz(likelihood, r)\n",
+    "plt.plot(r, prob, label=\"posterior\")\n",
+    "plt.axvline(20, color=\"C1\", label=\"truth\")\n",
+    "plt.legend()\n",
+    "plt.ylabel(\"probability density\")\n",
+    "plt.xlabel(\"spot radius [degrees]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Ensemble analyses"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As we argue in the paper, individual light curves simply aren't that constraining of the spot properties. In fact, the light curve in the example above is unable to confidently tell us if the spots are small or large! We can learn parameters much more precisely if we analyze many light curves of similar stars at once. To this end, let's analyze all 50 flux samples we generated earlier."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The joint probability is just the product of the probabilities for each dataset, so in log space we can simply take the sum over all 50 light curves:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "r = np.linspace(10, 45, 100)\n",
+    "ll = np.zeros_like(r)\n",
+    "for k in tqdm(range(len(r))):\n",
+    "    ll[k] = np.sum([log_likelihood(f[n], r[k]) for n in range(50)])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here is our posterior constraint (as before) on the radius:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "likelihood = np.exp(ll - np.max(ll))\n",
+    "prob = likelihood / np.trapz(likelihood, r)\n",
+    "plt.plot(r, prob, label=\"posterior\")\n",
+    "plt.axvline(20, color=\"C1\", label=\"truth\")\n",
+    "plt.legend()\n",
+    "plt.ylabel(\"probability density\")\n",
+    "plt.xlabel(\"spot radius [degrees]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It's much, much tighter, still consistent with the truth, and the degeneracy is gone. Ensemble analyses rock!"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. note::\n",
+    "\n",
+    "    You may have noticed that what we did in this tutorial was a bit circular: we generated samples from our GP, then used that same GP to infer the values of the hyperparameters. A much more rigorous test of the validity of the GP is to apply it to data generated with an actual forward model of spotted stellar surfaces. We devote a large section of our paper to doing just that, and showing that our GP is in fact well calibrated."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "That's it for this quick start tutorial. Be sure to check the other examples in this directory!"
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Raw Cell Format",
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

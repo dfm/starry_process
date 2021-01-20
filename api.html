@@ -1,0 +1,925 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; starry_process 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Using starry process as a prior" href="notebooks/Prior.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> starry_process
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html"> Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html"> Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"> API</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://starry-process.flatironinstitute.org"> Live demo</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/rodluger/starry_process"> GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/rodluger/starry_process/issues"> Submit an issue</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/rodluger/mapping_stellar_surfaces"> Read the papers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">starry_process</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="starry_process.StarryProcess">
+<em class="property">class </em><code class="sig-prename descclassname">starry_process.</code><code class="sig-name descname">StarryProcess</code><span class="sig-paren">(</span><em class="sig-param">r=20.0</em>, <em class="sig-param">dr=None</em>, <em class="sig-param">c=0.1</em>, <em class="sig-param">n=10.0</em>, <em class="sig-param">tau=None</em>, <em class="sig-param">temporal_kernel=&lt;function Matern32Kernel&gt;</em>, <em class="sig-param">marginalize_over_inclination=True</em>, <em class="sig-param">normalized=True</em>, <em class="sig-param">covpts=300</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>An interpretable Gaussian process for stellar light curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The mean star spot radius in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">20.0</span></code>. Care should be taken when
+modeling very small spots, as the spherical
+harmonic expansion can typically only model features
+with radius on the order of <code class="docutils literal notranslate"><span class="pre">180</span> <span class="pre">/</span> <span class="pre">ydeg</span></code> or larger.
+For the default spherical harmonic degree, the minimum
+radius is about 10 degrees. Values below this will
+typically lead to poor approximations, although the
+process will in general still be valid and numerically
+stable.</p></li>
+<li><p><strong>dr</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The half-width of the uniform prior
+on the spot radius in degrees. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+If this value is zero, a delta-function prior centered at
+<code class="docutils literal notranslate"><span class="pre">r</span></code> is assumed.</p></li>
+<li><p><strong>a</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Shape parameter of the spot latitude
+distribution. This is equal to the log of the <code class="docutils literal notranslate"><span class="pre">alpha</span></code>
+parameter characterizing the Beta distribution in the
+cosine of the latitude, scaled to the range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">0.4</span></code>. Cannot be set if <code class="docutils literal notranslate"><span class="pre">mu</span></code>
+and <code class="docutils literal notranslate"><span class="pre">sigma</span></code> are provided.</p></li>
+<li><p><strong>b</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Shape parameter of the spot latitude
+distribution. This is equal to the log of the <code class="docutils literal notranslate"><span class="pre">beta</span></code>
+parameter characterizing the Beta distribution in the
+cosine of the latitude, scaled to the range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">0.27</span></code>. Cannot be set if <code class="docutils literal notranslate"><span class="pre">mu</span></code>
+and <code class="docutils literal notranslate"><span class="pre">sigma</span></code> are provided.</p></li>
+<li><p><strong>mu</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Mode of the spot latitude
+distribution in degrees. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. If this parameter
+is set, <code class="docutils literal notranslate"><span class="pre">sigma</span></code> must also be set, and <code class="docutils literal notranslate"><span class="pre">a</span></code> and
+<code class="docutils literal notranslate"><span class="pre">b</span></code> cannot be provided.</p></li>
+<li><p><strong>sigma</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Standard deviation of the spot latitude
+distribution in degrees. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. If this parameter
+is set, <code class="docutils literal notranslate"><span class="pre">mu</span></code> must also be set, and <code class="docutils literal notranslate"><span class="pre">a</span></code> and
+<code class="docutils literal notranslate"><span class="pre">b</span></code> cannot be provided.</p></li>
+<li><p><strong>c</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The mean spot contrast as a fraction of
+the photospheric intensity. Default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
+<li><p><strong>n</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The total number of spots (does not
+have to be an integer). Note that since a
+<code class="docutils literal notranslate"><span class="pre">StarryProcess</span></code> does not model spots as discrete features,
+this parameter will not generally have the expected behavior
+when sampling from the prior. In other words, it is unlikely
+that a draw with <code class="docutils literal notranslate"><span class="pre">n=10</span></code> will have ten distinct spots when
+visualizing the corresponding stellar surface, nor will it
+necessarily have more spots than a draw with (say) <code class="docutils literal notranslate"><span class="pre">n=5</span></code>.
+However, this parameter <em>does</em> behave correctly in an
+inference setting: the posterior over <code class="docutils literal notranslate"><span class="pre">n</span></code> when doing
+inference on an ensemble of light curves is meaningful and
+should have a mean (on average) equal to the true number of
+spots (assuming all other model assumptions are valid).
+Default is <code class="docutils literal notranslate"><span class="pre">10.0</span></code>.</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The spot evolution timescale. This is
+the timescale of the kernel defined by <code class="docutils literal notranslate"><span class="pre">temporal_kernel</span></code>
+to model temporal variability of the stellar surface.
+In the case of no time evolution, set this to
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>temporal_kernel</strong> (<em>callable</em><em>, </em><em>optional</em>) – The kernel function used to
+model temporal variability. This must be a callable of the form
+<code class="docutils literal notranslate"><span class="pre">f(t1,</span> <span class="pre">t2,</span> <span class="pre">tau)</span></code> where <code class="docutils literal notranslate"><span class="pre">t1</span></code> and <code class="docutils literal notranslate"><span class="pre">t2</span></code> are tensors (scalar or
+vector-valued) representing the input times
+and <code class="docutils literal notranslate"><span class="pre">tau</span></code> is a tensor representing the timescale hyperparameter,
+and it must return a tensor covariance matrix of shape
+<code class="docutils literal notranslate"><span class="pre">(len(t1),</span> <span class="pre">len(t2))</span></code>.
+Recommended kernels
+are implemented in the <code class="docutils literal notranslate"><span class="pre">starry_process.temporal</span></code> module.
+Default is <code class="docutils literal notranslate"><span class="pre">Matern32Kernel</span></code>.</p></li>
+<li><p><strong>marginalize_over_inclination</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to
+marginalize over the inclination under the assumption of an
+isotropic prior. Recommended if there are no constraints on
+the inclination of the object. If this is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+the value of the <code class="docutils literal notranslate"><span class="pre">i</span></code> keyword to several of the methods in
+this class will be ignored. Default is
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>normalized</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not the flux observations
+(passed in calls to <code class="docutils literal notranslate"><span class="pre">log_likelihood</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sample_ylm_conditional</span></code>) are normalized. Usually, the
+true baseline in stellar photometry is unknown, as it
+requires knowledge of how bright the star would be in the
+absence of star spots. If the baseline is unknown
+(which is almost certainly the case), we recommend setting
+this keyword to <code class="docutils literal notranslate"><span class="pre">True</span></code> and make sure observations are
+mean- (or median-) normalized.
+Alternatively, particularly when the amplitude of variability
+is large, you may set this to <code class="docutils literal notranslate"><span class="pre">False</span></code> and explicitly
+model the unknown baseline with a latent parameter <em>for
+each star</em> when doing inference.
+Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>covpts</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of grid points on which to
+compute the kernel when <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code> is
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. Since the full covariance is expensive to
+compute, <code class="docutils literal notranslate"><span class="pre">StarryProcess</span></code> instead computes it on a uniform
+grid in phase lag and performs a cubic spline interpolation
+to obtain the covariance matrix. Increasing this number will
+improve the accuracy of the computation at the expense of
+greater runtime. Default is <code class="docutils literal notranslate"><span class="pre">300</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The following under-the-hood keyword arguments are also accepted,
+although changing them is not recommended unless you really understand
+what you are doing:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ydeg</strong> (<em>int</em><em>, </em><em>optional</em>) – The spherical harmonic  degree of the
+process. Default is <code class="docutils literal notranslate"><span class="pre">15</span></code>. Decreasing this
+value will speed up computations but decrease the ability
+to model small features on the surface. Increasing this
+above the default value is not recommended, as it can lead
+to numerical instabilities.</p></li>
+<li><p><strong>udeg</strong> (<em>int</em><em>, </em><em>optional</em>) – The degree of limb darkening.
+Default is <code class="docutils literal notranslate"><span class="pre">2</span></code>. Changing this is currently
+supported, but it is likely that future releases will
+deprecate this in favor of always using quadratic limb
+darkening, which can be analytically marginalized over.</p></li>
+<li><p><strong>normalization_order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the series
+expansion for the normalized covariance. Default is
+<code class="docutils literal notranslate"><span class="pre">20</span></code>.</p></li>
+<li><p><strong>normalization_zmax</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum value of the
+expansion parameter <code class="docutils literal notranslate"><span class="pre">z</span></code> when computing the normalized
+covariance. Values above this threshold will result in
+infinite variance and a log probability of <code class="docutils literal notranslate"><span class="pre">-np.inf</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">0.023</span></code>.</p></li>
+<li><p><strong>log_alpha_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of
+<code class="docutils literal notranslate"><span class="pre">log(alpha)</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>log_beta_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of <code class="docutils literal notranslate"><span class="pre">log(beta)</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>sigma_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of the latitude
+standard deviation in degrees. The latitude distribution
+becomes extremely non-gaussian for high values of <code class="docutils literal notranslate"><span class="pre">sigma</span></code>.
+This value is used to penalize such distributions when
+computing the jacobian of the transformation.
+Default is <code class="docutils literal notranslate"><span class="pre">45.0</span></code>.</p></li>
+<li><p><strong>compile_args</strong> (<em>list</em><em>, </em><em>optional</em>) – Additional arguments to be passed to
+the C compiler when compiling the ops for this class. Each
+entry in the list should be a tuple of <code class="docutils literal notranslate"><span class="pre">(name,</span> <span class="pre">value)</span></code> pairs.
+For possible options, see the macros under <code class="docutils literal notranslate"><span class="pre">USER</span> <span class="pre">CONSTANTS</span></code>
+in the header file
+<a class="reference external" href="https://github.com/rodluger/starry_process/blob/master/starry_process/ops/include/constants.h">starry_process/ops/include/constants.h</a>.</p></li>
+<li><p><strong>epsy</strong> (<em>float</em><em>, </em><em>optional</em>) – A small number added to the diagonal of the
+spherical harmonic covariance matrix for stability.
+Default is <code class="docutils literal notranslate"><span class="pre">1e-12</span></code>.</p></li>
+<li><p><strong>epsy15</strong> (<em>float</em><em>, </em><em>optional</em>) – A small number added to terms in the
+diagonal of the spherical harmonic covariance matrix
+above degree <code class="docutils literal notranslate"><span class="pre">15</span></code>, which become particularly unstable.
+Default is <code class="docutils literal notranslate"><span class="pre">1e-09</span></code>.</p></li>
+<li><p><strong>mx</strong> (<em>int</em><em>, </em><em>optional</em>) – x resolution of Mollweide grid
+(for map visualizations). Default is <code class="docutils literal notranslate"><span class="pre">300</span></code>.</p></li>
+<li><p><strong>my</strong> (<em>int</em><em>, </em><em>optional</em>) – y resolution of Mollweide grid
+(for map visualizations). Default is <code class="docutils literal notranslate"><span class="pre">150</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="starry_process.StarryProcess.cho_cov_ylm">
+<em class="property">property </em><code class="sig-name descname">cho_cov_ylm</code><a class="headerlink" href="#starry_process.StarryProcess.cho_cov_ylm" title="Permalink to this definition">¶</a></dt>
+<dd><p>The lower Cholesky factorization of the spherical harmonic covariance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.cov">
+<code class="sig-name descname">cov</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value">60.0</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">u</span><span class="o">=</span><span class="default_value">array([0.0, 0.0])</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>The GP flux covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>vector</em>) – The time array in arbitrary units.</p></li>
+<li><p><strong>i</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The inclination of the star in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">60.0</span></code>. If <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code>
+is set, this argument is ignored.</p></li>
+<li><p><strong>p</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The rotational period of the star in the same
+units as <code class="docutils literal notranslate"><span class="pre">t</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
+<li><p><strong>u</strong> (<em>vector</em><em>, </em><em>optional</em>) – The limb darkening coefficients for the
+star. Default is <code class="docutils literal notranslate"><span class="pre">[0.</span> <span class="pre">0.]</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.cov_pix">
+<code class="sig-name descname">cov_pix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">latlon</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.cov_pix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The covariance of the process in latitude-longitude pixel space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>latlon</strong> (<em>ndarray</em>) – The latitude(s) and longitude(s) at which to
+evaluate the covariance in degrees. This must be a numerical
+quantity (tensor inputs are not supported) of shape
+<code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">2)</span></code>, where the last dimension corresponds to
+a tuple of latitude-longitude values.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The tensor-valued covariance evaluated at the flattened vector of
+input coordinates.
+This will have shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">N)</span></code> where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the number of
+input lat-lon coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.cov_ylm">
+<em class="property">property </em><code class="sig-name descname">cov_ylm</code><a class="headerlink" href="#starry_process.StarryProcess.cov_ylm" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spherical harmonic covariance matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.covpts">
+<em class="property">property </em><code class="sig-name descname">covpts</code><a class="headerlink" href="#starry_process.StarryProcess.covpts" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of interpolation points for the covariance matrix
+when <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.flux">
+<code class="sig-name descname">flux</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value">60.0</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">u</span><span class="o">=</span><span class="default_value">array([0.0, 0.0])</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.flux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the light curve corresponding to a spherical harmonic
+representation of a surface <cite>y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>vector</em><em> or </em><em>matrix</em>) – The spherical harmonic coefficients. This
+can be an ndarray or tensor of any number of dimensions provided
+the last dimension has length equal to the number of spherical
+harmonic coefficients of the map. If time variability is enabled,
+the next to last dimension should be equal to the number of
+time points. The output from methods such
+as <code class="docutils literal notranslate"><span class="pre">sample_ylm</span></code> can thus be directly passed to this method.</p></li>
+<li><p><strong>t</strong> (<em>vector</em>) – The time array in arbitrary units.</p></li>
+<li><p><strong>i</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The inclination of the star in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">60.0</span></code>. If <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code>
+is set, this argument is ignored.</p></li>
+<li><p><strong>p</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The rotational period of the star in the same
+units as <code class="docutils literal notranslate"><span class="pre">t</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
+<li><p><strong>u</strong> (<em>vector</em><em>, </em><em>optional</em>) – The limb darkening coefficients for the
+star. Default is <code class="docutils literal notranslate"><span class="pre">[0.</span> <span class="pre">0.]</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The flux timeseries. This will in general have shape
+<cite>(…, nsamples, ntimes)</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.log_jac">
+<code class="sig-name descname">log_jac</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.log_jac" title="Permalink to this definition">¶</a></dt>
+<dd><p>The log of the absolute value of the determinant of the Jacobian matrix.</p>
+<p>The spot latitude is Beta-distributed with shape parameters
+<code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>, equal to the log of the traditional <code class="docutils literal notranslate"><span class="pre">alpha</span></code>
+and <code class="docutils literal notranslate"><span class="pre">beta</span></code> parameters of the Beta distribution, normalized and scaled
+to the range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>. From Bayes’ theorem, the joint posterior in
+these two quantities is</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[p\big(a, b \big| data\big) \sim
+p\big(data \big| a, b\big) \times  p(a, b)\]</div>
+</div></blockquote>
+<p>However, this is a rather awkward parametrization, since it’s hard to
+visualize how exactly <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> (or <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code>)
+determine quantities we actually care about, such as the mean <code class="docutils literal notranslate"><span class="pre">mu</span></code> and
+standard deviation <code class="docutils literal notranslate"><span class="pre">sigma</span></code> of the distribution. This parameterization
+is especially clumsy when it comes to specifying the prior <code class="docutils literal notranslate"><span class="pre">p(a,</span> <span class="pre">b)</span></code>,
+since any prior on these quantities will imply a very different prior
+on <code class="docutils literal notranslate"><span class="pre">mu</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma</span></code>. In most cases, we probably want to place a prior
+on <code class="docutils literal notranslate"><span class="pre">mu</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma</span></code> directly. We can do this by noting that</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[p(a, b) = p(\mu, \sigma) \times J\]</div>
+</div></blockquote>
+<p>where</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[J = \bigg| \frac{\partial{\mu}}{\partial{a}} \times
+           \frac{\partial{\sigma}}{\partial{b}} -
+           \frac{\partial{\mu}}{\partial{b}} \times
+           \frac{\partial{\sigma}}{\partial{a}} \bigg|\]</div>
+</div></blockquote>
+<p>is the absolute value of the determinant of the Jacobian matrix.</p>
+<p>Thus, to enforce a uniform prior on <code class="docutils literal notranslate"><span class="pre">mu</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma</span></code>, sample
+in <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> with a uniform prior in the range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>
+and multiply the PDF by <code class="docutils literal notranslate"><span class="pre">J</span></code>. Since we’re in log space, you’ll want
+to add <code class="docutils literal notranslate"><span class="pre">log</span> <span class="pre">J</span></code> (the value returned by this function) to the
+log likelihood.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">flux</span></em>, <em class="sig-param"><span class="n">data_cov</span></em>, <em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value">60.0</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">u</span><span class="o">=</span><span class="default_value">array([0.0, 0.0])</span></em>, <em class="sig-param"><span class="n">baseline_mean</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">baseline_var</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the log marginal likelihood of a light curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>vector</em>) – The time array in arbitrary units.</p></li>
+<li><p><strong>flux</strong> (<em>vector</em><em> or </em><em>matrix</em>) – <p>The array of observed flux values in arbitrary
+units. In general, the flux should be either mean- or
+median-normalized with zero baseline. If the raw photometry
+is measured in <code class="docutils literal notranslate"><span class="pre">counts</span></code>, users should compute the <code class="docutils literal notranslate"><span class="pre">flux</span></code>
+from</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">flux</span> <span class="o">=</span> <span class="n">counts</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>If the baseline is something else (such as unity), users
+may alternatively set the <code class="docutils literal notranslate"><span class="pre">baseline_mean</span></code> parameter to
+reflect that.
+Note that if the <code class="docutils literal notranslate"><span class="pre">normalized</span></code> keyword passed to this class
+is <code class="docutils literal notranslate"><span class="pre">False</span></code> (not recommended for real data), then the flux
+should instead be normalized to the true baseline (i.e., the
+counts one would measure if the star had no spots).
+Note, finally, that <code class="docutils literal notranslate"><span class="pre">flux</span></code> may also be a matrix, in which
+case each of its <code class="docutils literal notranslate"><span class="pre">M</span></code> rows is assumed to be the light curve
+of a different star whose periods, limb darkening coefficients,
+inclinations (if <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>)
+and data uncertainty are <em>all the same</em>. This is probably not
+very useful for real data, for which all of these are bound
+to be different even for “similar” stars, but it is very
+useful for testing and dealing with synthetic data. If that’s
+your use case, it’s much faster to pass in a batch of light
+curves than to call this function <code class="docutils literal notranslate"><span class="pre">M</span></code> times.
+Future versions of this code will (likely) provide the option
+to marginalize over period and limb darkening coefficients,
+in which case this feature will be <em>far</em> more useful!</p>
+</p></li>
+<li><p><strong>data_cov</strong> (<em>scalar</em><em>, </em><em>vector</em><em>, or </em><em>matrix</em>) – The data covariance
+matrix. This may be a scalar equal to the (homoscedastic)
+variance of the data, a vector equal to the variance of each
+observation, or a matrix equal to the full covariance of the
+dataset.</p></li>
+<li><p><strong>i</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The inclination of the star in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">60.0</span></code>. If <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code>
+is set, this argument is ignored.</p></li>
+<li><p><strong>p</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The rotational period of the star in the same
+units as <code class="docutils literal notranslate"><span class="pre">t</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
+<li><p><strong>u</strong> (<em>vector</em><em>, </em><em>optional</em>) – The limb darkening coefficients for the
+star. Default is <code class="docutils literal notranslate"><span class="pre">[0.</span> <span class="pre">0.]</span></code>.</p></li>
+<li><p><strong>baseline_mean</strong> (<em>scalar</em><em> or </em><em>vector</em><em>, </em><em>optional</em>) – The flux baseline to
+subtract when computing the GP likelihood. Default is
+<code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p></li>
+<li><p><strong>baseline_var</strong> (<em>scalar</em><em> or </em><em>matrix</em>) – The variance (square of the
+uncertainty) on the true value of the baseline. This is added
+to every element of the GP covariance matrix in order to
+marginalize over the baseline uncertainty. This may also be a
+matrix specifying the covariance due to additional correlated
+noise unrelated to star spot variability. Default is
+<code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The log marginal likelihood of the <cite>flux</cite> vector conditioned on
+the current properties of the model. This is the likelihood
+marginalized over all possible spherical harmonic vectors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.marginalize_over_inclination">
+<em class="property">property </em><code class="sig-name descname">marginalize_over_inclination</code><a class="headerlink" href="#starry_process.StarryProcess.marginalize_over_inclination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the process marginalizes over inclination under
+an isotropic prior.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.mean">
+<code class="sig-name descname">mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value">60.0</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">u</span><span class="o">=</span><span class="default_value">array([0.0, 0.0])</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>The GP flux mean vector.</p>
+<p>Note that this mean is defined relative to a baseline of zero. If
+<code class="docutils literal notranslate"><span class="pre">normalized</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, this method always returns zero. If
+<code class="docutils literal notranslate"><span class="pre">normalized</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, this method returns the mean flux deficit.
+In these units, a star with no spots on it has zero flux. To get
+light curves measured relative to a unit baseline, simply add 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>vector</em>) – The time array in arbitrary units.</p></li>
+<li><p><strong>i</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The inclination of the star in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">60.0</span></code>. If <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code>
+is set, this argument is ignored.</p></li>
+<li><p><strong>p</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The rotational period of the star in the same
+units as <code class="docutils literal notranslate"><span class="pre">t</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
+<li><p><strong>u</strong> (<em>vector</em><em>, </em><em>optional</em>) – The limb darkening coefficients for the
+star. Default is <code class="docutils literal notranslate"><span class="pre">[0.</span> <span class="pre">0.]</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.mean_pix">
+<code class="sig-name descname">mean_pix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">latlon</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.mean_pix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mean of the process in latitude-longitude pixel space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>latlon</strong> (<em>ndarray</em>) – The latitude(s) and longitude(s) at which to
+evaluate the mean in degrees. This must be a numerical
+quantity (tensor inputs are not supported) of shape
+<code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">2)</span></code>, where the last dimension corresponds to
+a tuple of latitude-longitude values.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The tensor-valued mean evaluated at the flattened vector of
+input coordinates.
+This will have shape <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the number of
+input lat-lon coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.mean_ylm">
+<em class="property">property </em><code class="sig-name descname">mean_ylm</code><a class="headerlink" href="#starry_process.StarryProcess.mean_ylm" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mean spherical harmonic coefficient vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.mollweide">
+<code class="sig-name descname">mollweide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">unit_background</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.mollweide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Mollweide projection of a spherical harmonic
+representation of a surface <cite>y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>vector</em><em> or </em><em>matrix</em>) – The spherical harmonic coefficients. This
+can be an ndarray or tensor of any number of dimensions provided
+the last dimension has length equal to the number of spherical
+harmonic coefficients of the map. The output from methods such
+as <code class="docutils literal notranslate"><span class="pre">sample_ylm</span></code> can thus be directly passed to this method.</p></li>
+<li><p><strong>unit_background</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), the
+returned image is shifted so that the unspotted surface has
+unit intensity; otherwise, the baseline is set to zero.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A matrix of dimension one greater than <cite>y</cite>, where the last two
+dimensions have shape <code class="docutils literal notranslate"><span class="pre">(my,</span> <span class="pre">mx)</span></code>, corresponding to the number
+of pixels along the vertical and horizontal axes of the rendered
+image. These parameters can be passed as kewyords when instantiating
+this class; their default values are <code class="docutils literal notranslate"><span class="pre">150</span></code> and
+<code class="docutils literal notranslate"><span class="pre">300</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.normalized">
+<em class="property">property </em><code class="sig-name descname">normalized</code><a class="headerlink" href="#starry_process.StarryProcess.normalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the process is modeling light curves that have
+been normalized to the (sample) mean (or median).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value">60.0</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">u</span><span class="o">=</span><span class="default_value">array([0.0, 0.0])</span></em>, <em class="sig-param"><span class="n">nsamples</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">1e-08</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw samples from the prior distribution over light curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>vector</em>) – The time array in arbitrary units.</p></li>
+<li><p><strong>i</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The inclination of the star in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">60.0</span></code>. If <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code>
+is set, this argument is ignored.</p></li>
+<li><p><strong>p</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The rotational period of the star in the same
+units as <code class="docutils literal notranslate"><span class="pre">t</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
+<li><p><strong>u</strong> (<em>vector</em><em>, </em><em>optional</em>) – The limb darkening coefficients for the
+star. Default is <code class="docutils literal notranslate"><span class="pre">[0.</span> <span class="pre">0.]</span></code>.</p></li>
+<li><p><strong>nsamples</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of samples to draw. Default 1.</p></li>
+<li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – A small number added to the diagonal of the
+flux covariance matrix when marginalizing over inclination
+for extra stability. If this method returns <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values, try
+increasing this value. Default is <code class="docutils literal notranslate"><span class="pre">1e-08</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of samples of shape <code class="docutils literal notranslate"><span class="pre">(nsamples,</span> <span class="pre">ntimes)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.sample_ylm">
+<code class="sig-name descname">sample_ylm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nsamples</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.sample_ylm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw samples from the prior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>vector</em><em>, </em><em>optional</em>) – If provided, return the samples evaluated
+at these points in time. This is only useful if the surface
+variability timescale <code class="docutils literal notranslate"><span class="pre">tau</span></code> is set. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>nsamples</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of samples to draw. Default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of samples of shape <code class="docutils literal notranslate"><span class="pre">(nsamples,</span> <span class="pre">ntimes,</span> <span class="pre">nylm)</span></code>
+(if a vector of times is provided) or <code class="docutils literal notranslate"><span class="pre">(nsamples,</span> <span class="pre">nylm)</span></code>
+if not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.sample_ylm_conditional">
+<code class="sig-name descname">sample_ylm_conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">flux</span></em>, <em class="sig-param"><span class="n">data_cov</span></em>, <em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value">60.0</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">u</span><span class="o">=</span><span class="default_value">array([0.0, 0.0])</span></em>, <em class="sig-param"><span class="n">baseline_mean</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">baseline_var</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">nsamples</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.sample_ylm_conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw samples from the process conditioned on observed flux values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>vector</em>) – The time array in arbitrary units.</p></li>
+<li><p><strong>flux</strong> (<em>vector</em>) – <p>The array of observed flux values in arbitrary
+units. In general, the flux should be either mean- or
+median-normalized with zero baseline. If the raw photometry
+is measured in <code class="docutils literal notranslate"><span class="pre">counts</span></code>, users should compute the <code class="docutils literal notranslate"><span class="pre">flux</span></code>
+from</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">flux</span> <span class="o">=</span> <span class="n">counts</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>If the baseline is something else (such as unity), users
+may alternatively set the <code class="docutils literal notranslate"><span class="pre">baseline_mean</span></code> parameter to
+reflect that.
+Note that if the <code class="docutils literal notranslate"><span class="pre">normalized</span></code> keyword passed to this class
+is <code class="docutils literal notranslate"><span class="pre">False</span></code> (not recommended for real data), then the flux
+should instead be normalized to the true baseline (i.e., the
+counts one would measure if the star had no spots).</p>
+</p></li>
+<li><p><strong>data_cov</strong> (<em>scalar</em><em>, </em><em>vector</em><em>, or </em><em>matrix</em>) – The data covariance
+matrix. This may be a scalar equal to the (homoscedastic)
+variance of the data, a vector equal to the variance of each
+observation, or a matrix equal to the full covariance of the
+dataset.</p></li>
+<li><p><strong>i</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The inclination of the star in degrees.
+Default is <code class="docutils literal notranslate"><span class="pre">60.0</span></code>. If <code class="docutils literal notranslate"><span class="pre">marginalize_over_inclination</span></code>
+is set, this argument is ignored.</p></li>
+<li><p><strong>p</strong> (<em>scalar</em><em>, </em><em>optional</em>) – The rotational period of the star in the same
+units as <code class="docutils literal notranslate"><span class="pre">t</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
+<li><p><strong>u</strong> (<em>vector</em><em>, </em><em>optional</em>) – The limb darkening coefficients for the
+star. Default is <code class="docutils literal notranslate"><span class="pre">[0.</span> <span class="pre">0.]</span></code>.</p></li>
+<li><p><strong>baseline_mean</strong> (<em>scalar</em><em> or </em><em>vector</em><em>, </em><em>optional</em>) – The flux baseline to
+subtract when computing the GP likelihood. Default is
+<code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p></li>
+<li><p><strong>baseline_var</strong> (<em>scalar</em><em> or </em><em>matrix</em>) – The variance (square of the
+uncertainty) on the true value of the baseline. This is added
+to every element of the GP covariance matrix in order to
+marginalize over the baseline uncertainty. This may also be a
+matrix specifying the covariance due to additional correlated
+noise unrelated to star spot variability. Default is
+<code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p></li>
+<li><p><strong>nsamples</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of samples to draw. Default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of samples of shape <code class="docutils literal notranslate"><span class="pre">(nsamples,</span> <span class="pre">nylm)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.visualize">
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">unit_background</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.StarryProcess.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize the Mollweide projection of a spherical harmonic
+representation of a surface <cite>y</cite> using matplotlib.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>vector</em><em> or </em><em>matrix</em><em>, </em><em>optional</em>) – The spherical harmonic coefficients. This
+can be an ndarray or tensor of any number of dimensions provided
+the last dimension has length equal to the number of spherical
+harmonic coefficients of the map and the next to last dimension
+is the number of frames in the animation. The output from methods such
+as <code class="docutils literal notranslate"><span class="pre">sample_ylm</span></code> can thus be directly passed to this method.
+If more than 2d, all but the last two dimensions are ignored.
+If not provided, <cite>y</cite> will be computed from a call to <cite>sample_ylm()</cite>.</p></li>
+<li><p><strong>unit_background</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), the
+returned image is shifted so that the unspotted surface has
+unit intensity; otherwise, the baseline is set to zero.</p></li>
+<li><p><strong>ax</strong> (<em>optional</em>) – A matplotlib axis instance to use. Default is
+to create a new figure.</p></li>
+<li><p><strong>cmap</strong> (<em>string</em><em> or </em><em>colormap instance</em><em>, </em><em>optional</em>) – The matplotlib colormap
+to use. Defaults to <code class="docutils literal notranslate"><span class="pre">plasma</span></code>.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Figure size in inches. Default is
+<code class="docutils literal notranslate"><span class="pre">(7,</span> <span class="pre">3.5)</span></code>.</p></li>
+<li><p><strong>colorbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Display a colorbar? Default is False.</p></li>
+<li><p><strong>grid</strong> (<em>bool</em><em>, </em><em>optional</em>) – Show latitude/longitude grid lines?
+Defaults to True.</p></li>
+<li><p><strong>interval</strong> (<em>int</em><em>, </em><em>optional</em>) – Interval between frames in milliseconds
+(animated maps only). Defaults to 75.</p></li>
+<li><p><strong>file</strong> (<em>string</em><em>, </em><em>optional</em>) – The file name (including the extension)
+to save the figure or animation to. Defaults to None.</p></li>
+<li><p><strong>html5_video</strong> (<em>bool</em><em>, </em><em>optional</em>) – If rendering in a Jupyter notebook,
+display as an HTML5 video? Default is True. If False, displays
+the animation using Javascript (file size will be larger.)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Image resolution in dots per square inch.
+Defaults to the value defined in <code class="docutils literal notranslate"><span class="pre">matplotlib.rcParams</span></code>.</p></li>
+<li><p><strong>bitrate</strong> (<em>int</em><em>, </em><em>optional</em>) – Bitrate in kbps (animations only).
+Defaults to the value defined in <code class="docutils literal notranslate"><span class="pre">matplotlib.rcParams</span></code>.</p></li>
+<li><p><strong>vmin</strong> (<em>float</em><em>, </em><em>optional</em>) – The lower bound of the colormap.</p></li>
+<li><p><strong>vmax</strong> (<em>float</em><em>, </em><em>optional</em>) – The upper bound of the colormap.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="starry_process.StarryProcess.ydeg">
+<em class="property">property </em><code class="sig-name descname">ydeg</code><a class="headerlink" href="#starry_process.StarryProcess.ydeg" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spherical harmonic degree of the surface map expansion.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="starry_process.beta2gauss">
+<code class="sig-prename descclassname">starry_process.</code><code class="sig-name descname">beta2gauss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">log_beta_max</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.beta2gauss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mode <code class="docutils literal notranslate"><span class="pre">mu</span></code> and standard deviation <code class="docutils literal notranslate"><span class="pre">sigma</span></code> of Laplace’s
+(Gaussian) approximation to the PDF of the latitude Beta distribution
+with shape parameters <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>scalar</em><em> or </em><em>vector</em>) – Shape parameter.</p></li>
+<li><p><strong>b</strong> (<em>scalar</em><em> or </em><em>vector</em>) – Shape parameter.</p></li>
+<li><p><strong>log_alpha_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of <code class="docutils literal notranslate"><span class="pre">ln(alpha)</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>log_beta_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of <code class="docutils literal notranslate"><span class="pre">ln(beta)</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The shape parameters <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are related to the shape parameters of
+the Beta distribution in cosine latitude via the transformations</p>
+<blockquote>
+<div></div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a utility function that can accept and return
+either numeric values or tensors. If both <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>
+are numeric quantities, the result will be a numeric
+quantity; otherwise it will be a tensor.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="starry_process.gauss2beta">
+<code class="sig-prename descclassname">starry_process.</code><code class="sig-name descname">gauss2beta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mu</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">log_beta_max</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#starry_process.gauss2beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the shape parameters <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> of the latitude Beta distribution
+closest to the Gaussian with mean <code class="docutils literal notranslate"><span class="pre">mu</span></code> and standard deviation <code class="docutils literal notranslate"><span class="pre">sigma</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mu</strong> (<em>scalar</em><em> or </em><em>vector</em>) – The mean latitude in degrees.</p></li>
+<li><p><strong>sigma</strong> (<em>scalar</em><em> or </em><em>vector</em>) – The latitude standard deviation in degrees.</p></li>
+<li><p><strong>log_alpha_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of <code class="docutils literal notranslate"><span class="pre">ln(alpha)</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>log_beta_max</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value of <code class="docutils literal notranslate"><span class="pre">ln(beta)</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The shape parameters <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are related to the shape parameters of
+the Beta distribution in cosine latitude via the transformations</p>
+<blockquote>
+<div></div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a utility function that can accept and return
+either numeric values or tensors. If both <code class="docutils literal notranslate"><span class="pre">mu</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma</span></code>
+are numeric quantities, the result will be a numeric
+quantity; otherwise it will be a tensor.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+  <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+    
+    
+    <a href="notebooks/Prior.html" class="btn btn-neutral float-left" title="Using starry process as a prior" accesskey="p"
+      rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+    
+  </div>
+  
+
+  <hr />
+
+  <div role="contentinfo">
+    <p>
+      
+      &copy; Copyright 2020, Rodrigo Luger.
+      <span class="lastupdated">
+        Last updated on 2021 Jan 20 at 20:55:33 UTC.
+      </span>
+
+    </p>
+  </div>
+  
+  
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
+    href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by
+  <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,515 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Time variability"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this tutorial, we will cover how to instatiate a time-variable `StarryProcess`, useful for modeling stars with spots that evolve over time. We will show how to sample from the process and use it to do basic inference."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "%config InlineBackend.figure_format = \"retina\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "import matplotlib\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "\n",
+    "# Disable annoying font warnings\n",
+    "matplotlib.font_manager._log.setLevel(50)\n",
+    "\n",
+    "# Disable theano deprecation warnings\n",
+    "import warnings\n",
+    "\n",
+    "warnings.filterwarnings(\"ignore\", category=DeprecationWarning)\n",
+    "warnings.filterwarnings(\"ignore\", category=matplotlib.MatplotlibDeprecationWarning)\n",
+    "warnings.filterwarnings(\"ignore\", category=FutureWarning)\n",
+    "warnings.filterwarnings(\"ignore\", category=UserWarning, module=\"theano\")\n",
+    "\n",
+    "# Style\n",
+    "plt.style.use(\"default\")\n",
+    "plt.rcParams[\"savefig.dpi\"] = 100\n",
+    "plt.rcParams[\"figure.dpi\"] = 100\n",
+    "plt.rcParams[\"figure.figsize\"] = (12, 4)\n",
+    "plt.rcParams[\"font.size\"] = 14\n",
+    "plt.rcParams[\"text.usetex\"] = False\n",
+    "plt.rcParams[\"font.family\"] = \"sans-serif\"\n",
+    "plt.rcParams[\"font.sans-serif\"] = [\"Liberation Sans\"]\n",
+    "plt.rcParams[\"font.cursive\"] = [\"Liberation Sans\"]\n",
+    "try:\n",
+    "    plt.rcParams[\"mathtext.fallback\"] = \"cm\"\n",
+    "except KeyError:\n",
+    "    plt.rcParams[\"mathtext.fallback_to_cm\"] = True\n",
+    "plt.rcParams[\"mathtext.fallback_to_cm\"] = True\n",
+    "\n",
+    "# Short arrays when printing\n",
+    "np.set_printoptions(threshold=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "del matplotlib\n",
+    "del plt\n",
+    "del warnings"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Setup"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from starry_process import StarryProcess\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from tqdm.auto import tqdm\n",
+    "import theano\n",
+    "import theano.tensor as tt"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To instantiate a time-variable `StarryProcess`, we simply pass a nonzero value for the `tau` parameter:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sp = StarryProcess(tau=25.0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This is the timescale of the surface evolution in arbitrary units (i.e., this will have the same units as the rotation period and the input time arrays; units of days are the common choice). We can also provide a GP kernel to model the time variability. By default a Matern-3/2 kernel is used, but that can be changed by supplying any of the kernels defined in the `starry_process.temporal` module with the `kernel` keyword. If you wish, you can even provide your own callable tensor-valued function of the form\n",
+    "\n",
+    "```python\n",
+    "def kernel(t1, t2, tau):\n",
+    "    (...)\n",
+    "    return K\n",
+    "```\n",
+    "\n",
+    "where `t1` and `t2` are the input times (scalars or vectors), `tau` is the timescale, and `K` is a covariance matrix of shape ``(len(t1), len(t2))``. \n",
+    "\n",
+    "Let's stick with the `Matern32` kernel for now, and specify a time array over which we'll evaluate the process:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "t = np.linspace(0, 50, 1000)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Sampling"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Sampling in spherical harmonics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The easiest thing we can do is sample maps. For time-variable processes, we can pass a time `t` argument to `sample_ylm` to get map samples evaluated at different points in time:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y = sp.sample_ylm(t).eval()\n",
+    "y"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note the shape of `y`, which is `(number of samples, number of times, number of ylms)`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "At every point in time, the spherical harmonic representation of the surface is different. We can visualize this as a movie by simply calling"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```python\n",
+    "sp.visualize(y)\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "# We actually tweak the contrast a little,\n",
+    "# and downsample to make this run quicker\n",
+    "sp.visualize(y[:, ::10], vmin=0.6, vmax=1.3)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Computing the corresponding light curve is easy:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux = sp.flux(y, t).eval()\n",
+    "flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "where the shape of `flux` is `(number of samples, number of times)`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We could also pass explicit values for the following parameters (otherwise they assume their default values):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "hide_input"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "from IPython.display import display, Markdown\n",
+    "from starry_process.defaults import defaults\n",
+    "\n",
+    "defaults[\"u\"] = defaults[\"u\"][: defaults[\"udeg\"]]\n",
+    "display(\n",
+    "    Markdown(\n",
+    "        \"\"\"\n",
+    "| attribute | description | default value |\n",
+    "| - | :- | :-:\n",
+    "| `i` | stellar inclination in degrees | `{i}` |\n",
+    "| `p` | stellar rotation period in days | `{p}`|\n",
+    "| `u` | limb darkening coefficient vector | `{u}` |\n",
+    "\"\"\".format(\n",
+    "            **defaults\n",
+    "        )\n",
+    "    )\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here's the light curve in parts per thousand:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.plot(t, 1e3 * flux[0])\n",
+    "plt.xlabel(\"rotations\")\n",
+    "plt.ylabel(\"relative flux [ppt]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Sampling in flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also sample in flux directly:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux = sp.sample(t, nsamples=50).eval()\n",
+    "flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "where again it's useful to note the shape of the returned quantity, `(number of samples, number of time points)`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here are all 50 light curves plotted on the same scale:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(10, 5, figsize=(12, 8), sharex=True, sharey=True)\n",
+    "ax = ax.flatten()\n",
+    "for k in range(50):\n",
+    "    ax[k].plot(t, 1e3 * flux[k], lw=0.5)\n",
+    "    ax[k].axis(\"off\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Doing inference"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also do inference using time-variable `StarryProcess` models. Let's do a mock ensemble analysis on the 50 light curves we generated above. First, let's add some observation noise. Here's what the first \"observed\" light curve looks like:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ferr = 1e-3\n",
+    "np.random.seed(0)\n",
+    "f = flux + ferr * np.random.randn(50, len(t))\n",
+    "plt.plot(t, flux[0], \"C0-\", lw=0.75, alpha=0.5)\n",
+    "plt.plot(t, f[0], \"C0.\", ms=3)\n",
+    "plt.xlabel(\"time [days]\")\n",
+    "plt.ylabel(\"relative flux [ppt]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, let's try to infer the timescale of the generating process. For simplicity, we'll keep all other parameters fixed at their default (and in this case, true) values. As in the [Quickstart](Quickstart.ipynb) tutorial, we compile the likelihood function using `theano`. It will accept two inputs, a light curve and a timescale, and will return the corresponding log likelihood. To make this example run a little faster, we'll also downsample the light curves by a factor of 5 (not recommended in practice! We should never throw out information!)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "f_tensor = tt.dvector()\n",
+    "tau_tensor = tt.dscalar()\n",
+    "log_likelihood = theano.function(\n",
+    "    [f_tensor, tau_tensor],\n",
+    "    StarryProcess(tau=tau_tensor).log_likelihood(t[::5], f_tensor[::5], ferr ** 2),\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Compute the joint likelihood of all datasets:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tau = np.linspace(0, 50, 100)\n",
+    "ll = np.zeros_like(tau)\n",
+    "for k in tqdm(range(len(tau))):\n",
+    "    ll[k] = np.sum([log_likelihood(f[n], tau[k]) for n in range(50)])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Following the same steps as in the [Quickstart](Quickstart.ipynb) tutorial, we can convert this into a posterior distribution by normalizing it (and implicitly assuming a uniform prior over `tau`):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "likelihood = np.exp(ll - np.max(ll))\n",
+    "prob = likelihood / np.trapz(likelihood, tau)\n",
+    "plt.plot(tau, prob, label=\"posterior\")\n",
+    "plt.axvline(25, color=\"C1\", label=\"truth\")\n",
+    "plt.legend()\n",
+    "plt.ylabel(\"probability density\")\n",
+    "plt.xlabel(\"variability timescale [days]\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As expected, we correctly infer the timescale of variability."
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Tags",
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
